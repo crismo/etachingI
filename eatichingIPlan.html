@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 2em;
+            justify-items: stretch;
+            align-items: stretch;
+            width: 90%;
+            height: 90%;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            border: 20px solid #fff;
+        }
+
+        .cell {
+            position: relative;
+            background-color: #2d3e50;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.15);
+            min-width: 0;
+            min-height: 0;
+            font-size: 1.5em;
+        }
+
+        .disabled {
+            background-color: #f4f4f4;
+            color: #2d3e50;
+        }
+
+        .important {
+            background-color: #e74c3c;
+        }
+
+        .weakNumber {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8em;
+        }
+
+        .footer {
+            position: absolute;
+            font-size: 0.8em;
+            text-align: right;
+            right: 10px;
+            bottom: 10px;
+        }
+
+        .small {
+            font-size: 0.5em;
+        }
+
+        .a4 {
+            margin: auto auto;
+        }
+
+        .a4>.portrait {
+            width: 210mm;
+            height: 297mm;
+
+        }
+
+        .a4>.landscape {
+            width: 297mm;
+            height: 210mm;
+        }
+
+        @media print {
+            .a4 {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <script id="courseInfo" type="application/json">
+        [
+            {
+                "id": 101,
+                "what": "Intro",
+                "description": "Introduksjon til kurset. Hva vil et fullført kurs ha å si for deg som student og for deg som lærer. Hva er dine forventninger til kurset? etc",
+                "time":"2t",
+                "who": [
+                "Christian ++"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 102,
+                "what": "Motivasjon & Autonomi I",
+                "who": [
+                "Christian "
+                ],
+                "decoration": []
+            },
+            {
+                "id": 103,
+                "what": "Metoder & Verktøy I",
+                "who": [
+                "Håkon",
+                "Apondi","Christian"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 104,
+                "what": "Motivasjon & Autonomi II",
+                "who": [
+                "Christian ",
+                ],
+                "decoration": []
+            },
+            {
+                "id": 105,
+                "what": "Metoder & Verktøy II",
+                "who": [
+                "Håkon",
+                "Apondi"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 106,
+                "what": "Pedagogikk & læringsteori I",
+                "who": [
+                "Elen"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 107,
+                "what": "Undervisningsfri",
+                "who": [
+                ""
+                ],
+                "decoration": ["disabled"]
+            },
+            {
+                "id": 108,
+                "what": "Pedagogikk & læringsteori II",
+                "who": [
+                "Elen"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 112,
+                "what": "Tema/Praktis",
+                "who": [
+                "Student drevet"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 109,
+                "what": "Evaluering & Tilbakemelding",
+                "who": [
+                "Christian ",
+                ],
+                "decoration": []
+            },
+            {
+                "id": 110,
+                "what": "Roller & Rellasjoner",
+                "who": [
+                "Halvard"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 111,
+                "what": "Undervisning i digital context",
+                "who": [
+                "??"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 113,
+                "what": "Tema/Praktisk",
+                "who": [
+                "Student drevet"
+                ],
+                "decoration": []
+            },
+            {
+                "id": 114,
+                "week":"...",
+                "what": "...",
+                "who": [
+                ""
+                ],
+                "decoration": []
+            },
+            {
+                "id": 115,
+                "week":"#50",
+                "what": "Hjemme eksamen",
+                "who": [
+                ""
+                ],
+                "decoration": ["important"]
+            }
+        ]
+    </script>
+
+    <template id="activityTemplate">
+        <div class="cell">
+            <div class="weakNumber">{{week}}<div class="small date">{{date}}</div>
+            </div>
+            {{what}}
+            <div class="footer">{{who}}</div>
+        </div>
+    </template>
+
+    <template id="detailedActivityTemplate">
+        <article>
+            <h1>{{what}}</h1>
+            <p>{{time}}</p>
+            <p>{{description}}</p>
+            {{ if task }}
+            <p>{{tasks}}</p>
+            {{/if}}
+            <p>{{who}}</p>
+        </article>
+
+    </template>
+
+
+    <div class="grid">
+
+    </div>
+
+
+
+    <script>
+        const courseInfo = JSON.parse(document.getElementById("courseInfo").text);
+        const itemTemplate = document.getElementById("activityTemplate").innerHTML;
+
+        let week = 34;
+
+        courseInfo.forEach(element => {
+
+            if (!element.week) {
+                element.week = `#${week}`;
+            }
+            week++;
+            element.date = formatDate(shortDateForStartOfWeek(week, 2023));
+
+            let itemContent = itemTemplate.replace(/\{\{(\w+)\}\}/g, function (_, varName) {
+                return varName in element ? element[varName] : _;
+            });
+
+            const container = document.createElement("div");
+            container.innerHTML = itemContent;
+            let cell = container.firstElementChild
+            if (element.decoration.length > 0) {
+                element.decoration.forEach(decoration => {
+                    cell.classList.add(decoration);
+                });
+            }
+
+            cell.addEventListener("click", function () {
+                alert(element.what);
+            });
+
+            document.querySelector(".grid").appendChild(cell);
+
+        });
+
+
+        function shortDateForStartOfWeek(week, year) {
+            let date = new Date(year, 0, 1 + (week - 1) * 7);
+            let day = date.getDay();
+            let diff = date.getDate() - day + (day == 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        function formatDate(date) {
+            let day = date.getDate();
+            let month = date.getMonth() + 1;
+            if (day < 10) day = '0' + day;
+            if (month < 10) month = '0' + month;
+            return day + '.' + month;
+        }
+
+    </script>
+
+
+</body>
+
+</html>
